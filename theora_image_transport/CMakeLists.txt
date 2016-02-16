@@ -1,7 +1,13 @@
 cmake_minimum_required(VERSION 2.8.3)
 project(theora_image_transport)
 
-find_package(OpenCV REQUIRED)
+set(CUSTOM_OPENCV_DIR "/home/autolab/opencv/opencv-3.1.0/install")
+find_package(OpenCV 3 REQUIRED PATHS ${CUSTOM_OPENCV_DIR} NO_DEFAULT_PATH)
+message(STATUS "OpenCV Includes: ${OpenCV_INCLUDE_DIRS}")
+message(STATUS "OpenCV Libraries: ${OpenCV_LIBRARIES}")
+message(STATUS "OpenCV Libs: ${OpenCV_LIBS}")
+message(STATUS "OpenCV Lib dir: ${OpenCV_LIB_DIR}")
+
 find_package(catkin REQUIRED COMPONENTS cv_bridge dynamic_reconfigure image_transport message_generation rosbag pluginlib std_msgs)
 
 add_message_files(DIRECTORY msg FILES Packet.msg)
@@ -19,13 +25,14 @@ pkg_check_modules(PC_THEORADEC REQUIRED theoradec)
 generate_dynamic_reconfigure_options(cfg/TheoraPublisher.cfg cfg/TheoraSubscriber.cfg)
 
 catkin_package(
-  INCLUDE_DIRS include
+  INCLUDE_DIRS ${OpenCV_INCLUDE_DIRS} include
   LIBRARIES ${PROJECT_NAME}
   CATKIN_DEPENDS message_runtime std_msgs
+  DEPENDS OpenCV3
 )
 
-include_directories(include ${catkin_INCLUDE_DIRS})
-include_directories(SYSTEM ${OpenCV_INCLUDE_DIRS}
+include_directories(include ${OpenCV_INCLUDE_DIRS} ${catkin_INCLUDE_DIRS})
+include_directories(SYSTEM
   ${PC_OGG_INCLUDE_DIRS}
   ${PC_THEORA_INCLUDE_DIRS}
   ${PC_THEORAENC_INCLUDE_DIRS}

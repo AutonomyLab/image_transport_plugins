@@ -5,21 +5,27 @@ if (CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX)
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Werror")
 endif()
 
-find_package(OpenCV REQUIRED)
+set(CUSTOM_OPENCV_DIR "/home/autolab/opencv/opencv-3.1.0/install")
+find_package(OpenCV 3 REQUIRED PATHS ${CUSTOM_OPENCV_DIR} NO_DEFAULT_PATH)
+message(STATUS "OpenCV Includes: ${OpenCV_INCLUDE_DIRS}")
+message(STATUS "OpenCV Libraries: ${OpenCV_LIBRARIES}")
+message(STATUS "OpenCV Libs: ${OpenCV_LIBS}")
+message(STATUS "OpenCV Lib dir: ${OpenCV_LIB_DIR}")
+
 find_package(catkin REQUIRED cv_bridge dynamic_reconfigure image_transport)
 
 # generate the dynamic_reconfigure config file
 generate_dynamic_reconfigure_options(cfg/CompressedDepthPublisher.cfg)
 
 catkin_package(
-  INCLUDE_DIRS include
+  INCLUDE_DIRS ${OpenCV_INCLUDE_DIRS} include
   LIBRARIES ${PROJECT_NAME}
   CATKIN_DEPENDS cv_bridge dynamic_reconfigure image_transport
   DEPENDS OpenCV
 )
 
-include_directories(include ${catkin_INCLUDE_DIRS})
-include_directories(SYSTEM ${OpenCV_INCLUDE_DIRS})
+include_directories(include ${OpenCV_INCLUDE_DIRS}  ${catkin_INCLUDE_DIRS})
+#include_directories(SYSTEM ${OpenCV_INCLUDE_DIRS})
 
 add_library(${PROJECT_NAME} src/compressed_depth_publisher.cpp src/compressed_depth_subscriber.cpp src/manifest.cpp src/codec.cpp)
 add_dependencies(${PROJECT_NAME} ${PROJECT_NAME}_gencfg)
